@@ -7,6 +7,7 @@ import fenics as fe
 import ase
 from ase.calculators.siesta import Siesta
 from ase import io
+from ase import Atoms
 from ase.calculators.lammpsrun import LAMMPS
 from ase.calculators.emt import EMT
 import lammps
