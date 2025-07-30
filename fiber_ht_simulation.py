@@ -5,6 +5,7 @@ from scipy.optimize import minimize
 import pyansys
 import fenics as fe
 import ase
+from ase.calculators.siesta import Siesta
 from ase import io
 from ase.calculators.lammpsrun import LAMMPS
 from ase.calculators.emt import EMT
@@ -20,10 +21,31 @@ def dft_calculation():
     from ase.calculators.siesta import Siesta
     from ase.visualize.plot import plot_atoms
     
-    # 构建α-石英晶体
-    a = 4.913  # Å
-    c = 5.405
-    atoms = bulk('SiO2', 'quartz', a=a, c=c)
+    # α-石英晶胞参数 (六角晶系)
+    a = 4.913  # Å (基面边长)
+    c = 5.405  # Å (垂直方向高度)
+    atoms = Atoms(
+        symbols='Si3O6',  # 9个原子：3个Si + 6个O
+        cell=[              # 晶胞矢量（六角坐标系）
+            [a, 0, 0],
+            [-a/2, a*(3**0.5)/2, 0],
+            [0, 0, c]
+        ],
+        positions=[         # 原子坐标（分数坐标转换为笛卡尔坐标）
+        # Si原子位置
+            [a/2, a/(2 * 3**0.5), c/2],        # Si1
+            [0, a/(3**0.5), c/2],            # Si2
+            [a/2, a*(3**0.5)/6, 0],          # Si3
+            # O原子位置
+            [0.415*a, 0.720*a, 0.217*c],     # O1
+            [0.585*a, 0.144*a, 0.217*c],     # O2
+            [0.415*a, 0.456*a, 0.783*c],     # O3
+            [0.585*a, 0.880*a, 0.783*c],     # O4
+            [0.415*a, 0.144*a, 0.217*c],     # O5
+            [0.585*a, 0.720*a, 0.217*c]      # O6
+        ],
+        pbc=True  # 周期性边界
+    )
     
     # DFT计算参数
     calc = Siesta(
